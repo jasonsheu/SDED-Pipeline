@@ -1,17 +1,7 @@
-<!DOCTYPE html>
+{% extends 'base.html' %}
 
-<html lang="en">
+{% block content %}
+    <h1>{% block title %} SDED Click2Mail Pipeline {% endblock %}</h1>
 
-    <head>
-        <meta charset="UTF-8">
-        <title>SDED Ragic to C2M Pipeline</title>
-        <link href="styles.css" rel="stylesheet" type="text/css">
-        <link href="sded-logo.png" rel="icon" type="image/png">
-    </head>
-
-    <body>
-        <h1>Welcome</h1>
-        <a href="new-job.html">Create a job</a>
-    </body>
-
-</html>
+    <a href="{{ url_for('create') }}">Create a job</a>
+{% endblock %}
