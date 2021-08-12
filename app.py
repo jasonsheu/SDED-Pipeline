@@ -1,7 +1,12 @@
-from flask import Flask, render_template
-application =  Flask(__name__)
+from flask import Flask
+from flask import render_template
 
-@application.route('/')
+app = Flask(__name__)
+
+@app.route('/')
 def index():
 	return render_template('index.html')
 
+@app.route('/new-job/')
+def create():
+	return render_template('new-job.html')
