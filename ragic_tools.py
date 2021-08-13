@@ -1,3 +1,4 @@
+import json
 import requests
 import pandas as pd
 
@@ -28,6 +29,9 @@ class RagicTools():
 
     def log_in(self, username, password): #TODO
         payload = [('u', username), ('p', password), ('login_type', 'sessionId'), ('api','')]
+        
+        self.endpoint_url = 'https://www.ragic.com/AUTH?api&APIKey=%s' % (self.tab_folder, self.sheet_index, self.api_key)
+
         r = requests.get("https://www.ragic.com/AUTH", params=payload)
 
 
@@ -36,7 +40,10 @@ class RagicTools():
         gets table passed into constructor
         '''
         r = requests.get(self.endpoint_url)
+
         print("Retrieving table at:", self.endpoint_url)
+        
+        # Dump json (dict) object into a string
         return r.json()
 
     def add_entry(self, entry):
