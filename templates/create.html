@@ -4,20 +4,38 @@
 <h1>{% block title %} Create a New Job {% endblock %}</h1>
 
 <form method="post">
+    <!-- TODO
+        1. Select endpoint (https://www.ragic.com/<account>/<tab folder>/<sheet Index>[/<record id>]?v=3&api)
+                Account: ccedatabase
+                Tab Folder: [fixed or variable?]
+                shee Index: user-input
+        2. Backend request table from Ragic API
+    -->
     <div class="form-group">
-        <label for="title">Title</label>
-        <input type="text" name="title"
-               placeholder="Post title" class="form-control"
-               value="{{ request.form['title'] }}"></input>
+        <label for="tab_folder">Tab folder</label>
+        <input type="text" name="tab_folder"
+               placeholder="Ex: Colleges" class="form-control"
+               value="{{ request.form['tab_folder'] }}"></input>
     </div>
 
     <div class="form-group">
-        <label for="content">Content</label>
-        <textarea name="content" placeholder="Post content"
-                  class="form-control">{{ request.form['content'] }}</textarea>
+        <label for="sheet_index">Sheet number</label> 
+        <input type="text" name="sheet_index"
+                placeholder="Ex: 1" class="form-control"
+                value="{{ request.form['sheet_index'] }}"></input>
     </div>
+
+    <div class="form-group">
+        <label for="api_key">API Key</label> <!-- How to find API Key? -->
+        <input type="text" name="api_key"
+                placeholder="Not your password" class="form-control"
+                value="{{ request.form['api_key'] }}"></input>
+    </div>
+
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Submit</button>
     </div>
+
+
 </form>
 {% endblock %}

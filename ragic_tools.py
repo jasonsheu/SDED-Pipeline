@@ -1,19 +1,42 @@
 import requests
-import config
-from api import c2mAPI
 import pandas as pd
 
+import c2mAPI
+
 class RagicTools():
-    def __init__(self, table_id, group_name, api):
-        self.table_id = str(table_id)
-        self.group_name = str(group_name)
-        self.api = api
-        self.url = 'https://www.ragic.com/ccedatabase/%s/%s?api&APIKey=%s' % (self.group_name, self.table_id, self.api)
+    def __init__(self, tab_folder, sheet_index, api_key):
+        self.tab_folder = str(tab_folder)
+        self.sheet_index = str(sheet_index)
+        self.api_key = api_key
+
+
+        self.base_url = 'https://www.ragic.com'
+        self.account = 'ccedatabase' #TODO
+
+        self.endpoint_url = 'https://www.ragic.com/ccedatabase/%s/%s?api&APIKey=%s' % (self.tab_folder, self.sheet_index, self.api_key)
+
+    def build_endpoint_url(self): #TODO
+        '''
+        Build the URL endpoint for the initially-specified table
+        for v3, this looks like 
+        
+        For info on how to find Ragic API endpoints, see:
+        https://www.ragic.com/intl/en/doc-api/7/Finding-API-endpoints
+        '''
+
+        pass
+
+    def log_in(self, username, password): #TODO
+        payload = [('u', username), ('p', password), ('login_type', 'sessionId'), ('api','')]
+        r = requests.get("https://www.ragic.com/AUTH", params=payload)
+
+
     def get_table(self):
         '''
         gets table passed into constructor
         '''
-        r = requests.get(self.url)
+        r = requests.get(self.endpoint_url)
+        print("Retrieving table at:", self.endpoint_url)
         return r.json()
 
     def add_entry(self, entry):
@@ -29,7 +52,7 @@ class RagicTools():
         adds entry to table
         '''
 
-        r = requests.post(self.url, files = entry)
+        r = requests.post(self.endpoint_url, files = entry)
         return r.json()
 
     def delete_entry(self, row_id):
@@ -37,8 +60,8 @@ class RagicTools():
         deletes row in current table in
         '''
         row_id = str(row_id)
-        url = 'https://www.ragic.com/ccedatabase/%s/%s/%s?api&APIKey=%s' % (self.group_name, self.table_id, row_id, self.api)
-        r = requests.delete(url)
+        endpoint_url = 'https://www.ragic.com/ccedatabase/%s/%s/%s?api&APIKey=%s' % (self.tab_folder, self.sheet_index, row_id, self.api_key)
+        r = requests.delete(endpoint_url)
         return r.json()
 
     def update_entry(self, row_id, updated_entry):
@@ -54,20 +77,19 @@ class RagicTools():
 
         '''
         row_id = str(row_id)
-        url = 'https://www.ragic.com/ccedatabase/%s/%s/%s?api&APIKey=%s' % (self.group_name, self.table_id, row_id, self.api)
-        r = requests.post(url, updated_entry)
+        endpoint_url = 'https://www.ragic.com/ccedatabase/%s/%s/%s?api&APIKey=%s' % (self.tab_folder, self.sheet_index, row_id, self.api_key)
+        r = requests.post(endpoint_url, updated_entry)
         return r.json()
 
-    def get_table_id(self):
-        return self.table_id
+    def get_sheet_index(self):
+        return self.sheet_index
     def get_group(self):
-        return self.group_name
+        return self.tab_folder
 
 
 class RagicMailer:
 
     def __init__(self, file, username, password):
-
         self.df = pd.read_csv(file)
         self.username = username
         self.password = password
@@ -76,7 +98,7 @@ class RagicMailer:
     def send_all_mail(self, filename, path):
         c2m = c2mAPI.c2mAPIBatch(self.username, self.password, "0") #change to 1 for production
         c2m.setFileName(filename, path) #set the name ane file path for batch
-
+        
         #change to appropriate address and options
         po = c2mAPI.printOptions('Letter 8.5 x 11','Next Day','Address on Separate Page','Full Color','White 24#','Printing both sides','First Class','#10 Double Window')
         ad = c2mAPI.returnAddress("Jason Sheu","SDED","3855 Nobel Drive","apt 2101","La Jolla","CA","92122")
