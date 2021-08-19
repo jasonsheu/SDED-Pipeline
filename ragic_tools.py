@@ -1,8 +1,56 @@
 import json
 import requests
 import pandas as pd
+from requests.sessions import session
 
 import c2mAPI
+
+class RagicReader():
+
+    def __init__(self, API_key):
+        '''
+            Initialize a ragic API session with an API key
+        '''
+        self.server = 'https://www.ragic.com'
+        self.API_key = API_key
+
+        self.session = requests.session()
+        self.session.get(self.server)
+    
+    def __init__(self, username, password) -> None:
+        '''
+            Initialize a ragic API session by authenticating a username
+            and password.
+        '''
+        AUTH_endpoint = 'https://www.ragic.com/AUTH?api'
+        payload = {'v': '3', 'u': username, 'p': password, 'login_type': 'sessionId'}
+        response = requests.get(AUTH_endpoint, params=payload)
+        session_ID = response.cookies
+
+        API_endpoint = 'https://www.ragic.com/sims/reg/getAPIKey.jsp'
+        response = requests.get(API_endpoint, cookies=session_ID)
+        API_key = response.text
+
+        self.__init__(API_key)
+
+    def 
+
+
+
+
+
+    def build_endpoint_url(self): #TODO
+        '''
+        Build the URL endpoint for the initially-specified table
+        for v3, this looks like 
+        
+        For info on how to find Ragic API endpoints, see:
+        https://www.ragic.com/intl/en/doc-api/7/Finding-API-endpoints
+        '''
+
+        pass
+
+
 
 class RagicTools():
     def __init__(self, tab_folder, sheet_index, api_key):
@@ -16,16 +64,7 @@ class RagicTools():
 
         self.endpoint_url = 'https://www.ragic.com/ccedatabase/%s/%s?api&APIKey=%s' % (self.tab_folder, self.sheet_index, self.api_key)
 
-    def build_endpoint_url(self): #TODO
-        '''
-        Build the URL endpoint for the initially-specified table
-        for v3, this looks like 
-        
-        For info on how to find Ragic API endpoints, see:
-        https://www.ragic.com/intl/en/doc-api/7/Finding-API-endpoints
-        '''
 
-        pass
 
     def log_in(self, username, password): #TODO
         payload = [('u', username), ('p', password), ('login_type', 'sessionId'), ('api','')]
