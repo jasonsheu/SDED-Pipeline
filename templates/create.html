@@ -1,6 +1,4 @@
-{% extends 'base.html' %}
-
-{% block content %}
+{% extends 'base.html' %} {% block content %}
 <h1>{% block title %} Create a New Job {% endblock %}</h1>
 
 <form method="post">
@@ -13,24 +11,30 @@
     -->
     <div class="form-group">
         <label for="tab_folder">Tab folder</label>
-        <input type="text" name="tab_folder"
-               placeholder="Ex: Colleges" class="form-control"
-               value="{{ request.form['tab_folder'] }}"></input>
+        <input type="text" name="tab_folder" placeholder="Ex: Colleges" class="form-control" value="{{ request.form['tab_folder'] }}"></input>
     </div>
 
     <div class="form-group">
-        <label for="sheet_index">Sheet number</label> 
-        <input type="text" name="sheet_index"
-                placeholder="Ex: 1" class="form-control"
-                value="{{ request.form['sheet_index'] }}"></input>
+        <label for="sheet_index">Sheet number</label>
+        <input type="text" name="sheet_index" placeholder="Ex: 1" class="form-control" value="{{ request.form['sheet_index'] }}"></input>
     </div>
 
     <div class="form-group">
-        <label for="api_key">API Key</label> <!-- How to find API Key? -->
-        <input type="text" name="api_key"
-                placeholder="Not your password" class="form-control"
-                value="{{ request.form['api_key'] }}"></input>
+        <label for="api_key">API Key</label>
+        <!-- How to find API Key? -->
+        <input type="text" name="api_key" placeholder="Not your password" class="form-control" value="{{ request.form['api_key'] }}"></input>
     </div>
+
+    <div class="form-group">
+        <label for="csv_file">Upload CSV file</label>
+        <form method=post enctype="multipart/form-data">
+            <input type="file" name=file>
+
+            <input type="submit" value=Upload class='btn btn-primary'>
+        </form>
+    </div>
+
+
 
     <div class="form-group">
         <button type="submit" class="btn btn-primary">Submit</button>
