@@ -1,6 +1,7 @@
 import json
 import requests
 import pandas as pd
+from requests.models import encode_multipart_formdata
 from requests.sessions import session
 
 import c2mAPI
@@ -22,7 +23,7 @@ class RagicReader():
             Initialize a ragic API session by authenticating a username
             and password.
         '''
-        AUTH_endpoint = 'https://www.ragic.com/AUTH?api'
+        AUTH_endpoint = 'https://www.ragic.com/AUTH'
         payload = {'v': '3', 'u': username, 'p': password, 'login_type': 'sessionId'}
         response = requests.get(AUTH_endpoint, params=payload)
         session_ID = response.cookies
@@ -33,7 +34,10 @@ class RagicReader():
 
         self.__init__(API_key)
 
-    def 
+    def ragic_api_request(self, endpoint, payload):
+        url = self.server + endpoint + '?api'
+        response = requests.get(endpoint, params=payload)
+        return response
 
 
 
