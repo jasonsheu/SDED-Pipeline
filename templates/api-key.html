@@ -1,0 +1,42 @@
+{% extends 'base.html' %} {% block content %}
+<h1>{% block title %} Home {% endblock %}</h1>
+
+<p>
+    An API Key is an extremely long code that functions as both your username and password.
+    It allows you to access an Application Programming Interface (API). Our tool makes use
+    of the Ragic and Click2Mail API's to automate your mailing campaigns!
+</p>
+
+<p>
+    Normally you would be able to find your API key in the settings ~somewhere~
+    If you prefer, we can use the email and password for your Ragic account to retrieve your
+    key automatically!
+</p>
+
+<form method="post">
+
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="email" name="username" autocomplete="username" required placeholder="ex: cookie.monster@sandiegoenergydistrict.org" class="form-control" value="{{ request.form['username'] }}"/>
+    </div>
+
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" name="password" autocomplete="current-password" required class="form-control" value="{{ request.form['password'] }}"/>
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Submit</button>
+    </div>
+
+</form>
+
+{% if api_key %}
+<br>
+<div class="card alert alert-success">Your API Key is:<br>{{ api_key }}</div>
+<button type="button" class="btn btn-success" onclick="prompt('Here is your API key', '{{ api_key }}')">View Key</button>
+<button type="button" class="btn btn-success" onclick="navigator.clipboard.writeText('{{ api_key }}')">Copy Key</button>
+{% endif %}
+
+
+{% endblock %}

@@ -6,40 +6,71 @@ from requests.sessions import session
 
 import c2mAPI
 
+
+# TODO Separate into 2 classes, RagicReader (a single instance of a session), and RagicTools (classless?)
+# TODO https://www.ragic.com/intl/en/doc-api/10/Limiting-Entry-Number-%2F-Paging
+
 class RagicReader():
 
-    def __init__(self, API_key):
+    class AuthenticationError(Exception):
+        pass
+
+    # Instance variables
+    _SERVER = 'https://www.ragic.com/'
+
+
+    def __init__(self, api_key: str) -> 'RagicReader':
         '''
             Initialize a ragic API session with an API key
         '''
-        self.server = 'https://www.ragic.com'
-        self.API_key = API_key
+        
+        self.api_key = api_key
 
         self.session = requests.session()
         self.session.get(self.server)
     
-    def __init__(self, username, password) -> None:
+    @classmethod
+    def get_api_key(cls, username: str, password: str) -> str:
         '''
             Initialize a ragic API session by authenticating a username
             and password.
         '''
-        AUTH_endpoint = 'https://www.ragic.com/AUTH'
-        payload = {'v': '3', 'u': username, 'p': password, 'login_type': 'sessionId'}
-        response = requests.get(AUTH_endpoint, params=payload)
-        session_ID = response.cookies
 
-        API_endpoint = 'https://www.ragic.com/sims/reg/getAPIKey.jsp'
-        response = requests.get(API_endpoint, cookies=session_ID)
-        API_key = response.text
+        # Authenticate the username and password
+        AUTH_URL = cls._SERVER + 'AUTH' + '?api&v=3'
+        payload = {'login_type': 'sessionId', 'u': username, 'p': password}
+        response = requests.get(AUTH_URL, payload)
 
-        self.__init__(API_key)
+        # Username or password are not correct
+        if response.text == '-1':
+            raise cls.AuthenticationError
+        
+        API_KEY_URL = cls._SERVER + 'sims/reg/getAPIKey.jsp'
+        response = requests.get(API_KEY_URL, cookies = response.cookies)
+        
+        api_key = response.text
 
-    def ragic_api_request(self, endpoint, payload):
-        url = self.server + endpoint + '?api'
-        response = requests.get(endpoint, params=payload)
+        return api_key
+
+    def authenticate(self, username: str, password: str):
+        AUTH_URL = self._SERVER + 'AUTH'
+
+
+
+    def api_request(self, endpoint, payload, server = None):
+        # Format endpoint from list or tuple
+        if isinstance(endpoint, (list, tuple)):
+            endpoint = '/'.join(endpoint)
+
+        if server is None:
+            server = self.server
+
+        # Build base url for Ragic API v3
+        url = server + endpoint + '?api&v=3'
+
+        response = requests.get(url, params=payload)
+
         return response
-
-
 
 
 
@@ -57,6 +88,7 @@ class RagicReader():
 
 
 class RagicTools():
+
     def __init__(self, tab_folder, sheet_index, api_key):
         self.tab_folder = str(tab_folder)
         self.sheet_index = str(sheet_index)
@@ -69,13 +101,6 @@ class RagicTools():
         self.endpoint_url = 'https://www.ragic.com/ccedatabase/%s/%s?api&APIKey=%s' % (self.tab_folder, self.sheet_index, self.api_key)
 
 
-
-    def log_in(self, username, password): #TODO
-        payload = [('u', username), ('p', password), ('login_type', 'sessionId'), ('api','')]
-        
-        self.endpoint_url = 'https://www.ragic.com/AUTH?api&APIKey=%s' % (self.tab_folder, self.sheet_index, self.api_key)
-
-        r = requests.get("https://www.ragic.com/AUTH", params=payload)
 
 
     def get_table(self):

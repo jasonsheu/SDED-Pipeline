@@ -20,19 +20,19 @@
     </div>
 
     <div class="form-group">
-        <label for="api_key">API Key</label>
+        <label for="api_key">API Key <a href="{{ url_for('get_api_key') }}">(What's this?)</a></label>
         <!-- How to find API Key? -->
         <input type="text" name="api_key" placeholder="Not your password" class="form-control" value="{{ request.form['api_key'] }}"></input>
     </div>
 
-    <div class="form-group">
+    <!-- <div class="form-group">
         <label for="csv_file">Upload CSV file</label>
         <form method=post enctype="multipart/form-data">
             <input type="file" name=file>
 
-            <input type="submit" value=Upload class='btn btn-primary'>
+            <input type="button" value="Upload" class='btn btn-secondary'>
         </form>
-    </div>
+    </div> -->
 
 
 
