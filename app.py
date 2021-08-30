@@ -66,11 +66,11 @@ def confirmation():
     meta_fnames = ["_ragicId", "_star", "_index_title_", "_index_", "_seq"]
     field_names = [key for key in data['0'].keys() if key not in meta_fnames]
 
-    print(field_names)
+    num_entries = len(data)
+
+    # {'0': val0 , ...} -> [val0, val1]
 
     
-    
-
     return render_template('confirmation.html', table_info=repr(data))
 
 @app.route('/help/api-key', methods=('GET', 'POST'))
