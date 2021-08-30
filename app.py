@@ -51,10 +51,13 @@ def request_spreadsheet():
 def confirmation():
     json_file = open(LOG_FILE, 'r')
 
-    data = json.load(json_file) # load json file into python dict object
+    df = pd.read_json('test.json')
+    df = df.transpose()
+    df = df.drop(["_ragicId", "_star", "_index_title_", "_index_", "_seq"], axis=1).sort_index()
+    data = df.to_dict('records')
     
     # Parse the table information
-    print("Printing table info:")
+    print(data)
     
     # for key1 in data:
     #     print("Entry:", key1)
@@ -63,9 +66,7 @@ def confirmation():
     #         if (key2[0] != '_'):
     #             print('    ', key2, ":", item[key2])
 
-    meta_fnames = ["_ragicId", "_star", "_index_title_", "_index_", "_seq"]
-    field_names = [key for key in data['0'].keys() if key not in meta_fnames]
-
+    
     num_entries = len(data)
 
     # {'0': val0 , ...} -> [val0, val1]
