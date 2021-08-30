@@ -51,7 +51,7 @@ def request_spreadsheet():
 def confirmation():
     json_file = open(LOG_FILE, 'r')
 
-    df = pd.read_json('test.json')
+    df = pd.read_json(json_file)
     df = df.transpose()
     df = df.drop(["_ragicId", "_star", "_index_title_", "_index_", "_seq"], axis=1).sort_index()
     data = df.to_dict('records')
