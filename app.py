@@ -123,7 +123,7 @@ def history():
 
 @app.route('/favicon.ico')
 def icon():
-    return redirect(url_for('static', 'sded-logo.png'))
+    return redirect(url_for('static', filename='sded-logo.png'))
 
 
 #file uploading

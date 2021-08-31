@@ -10,7 +10,7 @@
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', 'bootstrap.css') }}">
 
-    <link rel="stylesheet" type="text/css" href="{{ url_for('static', 'minimal-table.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'minimal-table.css') }}">
 
 
     <!-- Title and Icon for browser tab -->
@@ -21,7 +21,7 @@
 <body>
     <!-- The navigation bar -->
     <nav class="navbar navbar-expand-md navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url_for('index')}}">Pipeline</a>
+        <a class="navbar-brand" href="{{ url_for('index') }}">Pipeline</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
