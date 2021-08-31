@@ -1,16 +1,17 @@
 from flask import Flask, render_template, request, url_for, flash, redirect
 from ragic_tools import *
-import os
+from Click2Mail import Address
 from werkzeug.utils import secure_filename
+import os
 
 
-upload_folder = "/uploads"
-ALLOWED_EXTENSIONS = {'csv','txt'}
-
-
+# Flask App Initialization
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b"_\xa8\xf0\x10\xcc3\xa6n\x9c'\xd1\xc5\x91\x06z1=\x8b|\xe7\xb8\x8d\xdb\xdd3\xd4j\x9e5\xdf\x04\xf5"
-app.config['UPLOAD_FOLDER'] = upload_folder
+app.config['UPLOAD_FOLDER'] = "/uploads"
+
+# Global Constant Declaration
+ALLOWED_EXTENSIONS = {'csv','txt'}
 LOG_FILE = "test.json"
 
 
@@ -55,24 +56,15 @@ def confirmation():
     df = df.transpose()
     df = df.drop(["_ragicId", "_star", "_index_title_", "_index_", "_seq"], axis=1).sort_index()
     data = df.to_dict('records')
+
+    data = [Address(entry) for entry in data]
     
     # Parse the table information
     print(data)
     
-    # for key1 in data:
-    #     print("Entry:", key1)
-    #     item = data[key1]
-    #     for key2 in item:
-    #         if (key2[0] != '_'):
-    #             print('    ', key2, ":", item[key2])
+    flat_data = [list(entry) for entry in data]
 
-    
-    num_entries = len(data)
-
-    # {'0': val0 , ...} -> [val0, val1]
-
-    
-    return render_template('confirmation.html', table_info=repr(data))
+    return render_template('confirmation.html', table_body=flat_data)
 
 @app.route('/help/api-key', methods=('GET', 'POST'))
 def get_api_key():
