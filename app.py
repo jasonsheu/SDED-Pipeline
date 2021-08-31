@@ -12,7 +12,7 @@ app.config['UPLOAD_FOLDER'] = "/uploads"
 
 # Global Constant Declaration
 ALLOWED_EXTENSIONS = {'csv','txt'}
-LOG_FILE = "test.json"
+LOG_FILE = "address_list.json"
 
 
 @app.route('/')
@@ -92,12 +92,24 @@ def c2m_publish():
     # Production account (1)
     # c2m = c2mAPI.c2mAPIRest("lanewsharman","1Lovesandiego","1")
     
-    #Adding address
-    address = {'First_name':'Jason','Last_name':'Sheu','organization':'SDED','Address1':'3855 Nobel Dr','Address2':'Apt 2101','City':'La Jolla','State':'CA','Zip':'92122','Country_non-US':''}
-    c2m.addressList.append(address)
+
+    json_file = open(LOG_FILE, 'r')
+
+    df = pd.read_json(json_file)
+    df = df.transpose()
+    df = df.drop(["_ragicId", "_star", "_index_title_", "_index_", "_seq"], axis=1).sort_index()
+    data = df.to_dict('records')
+
+    for address in data:
+        c2m.addressList.append(address)
+
     
-    address = {'First_name':'Nico','Last_name':'de la Fuente','organization':'SDED','Address1':'2293 Dunlop St','Address2':'Apt 66','City':'San Dieg','State':'CA','Zip':'92111','Country_non-US':''}
-    c2m.addressList.append(address)
+    #Adding address
+    #address = {'First_name':'Jason','Last_name':'Sheu','organization':'SDED','Address1':'3855 Nobel Dr','Address2':'Apt 2101','City':'La Jolla','State':'CA','Zip':'92122','Country_non-US':''}
+    #c2m.addressList.append(address)
+    
+    #address = {'First_name':'Nico','Last_name':'de la Fuente','organization':'SDED','Address1':'2293 Dunlop St','Address2':'Apt 66','City':'San Dieg','State':'CA','Zip':'92111','Country_non-US':''}
+    #c2m.addressList.append(address)
 
     # Setting  Print Options
     po = c2mAPI.printOptions('Letter 8.5 x 11','Next Day','Address on First Page','Black and White','White 24#','Printing both sides','First Class','#10 Double Window')
