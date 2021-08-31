@@ -11,7 +11,7 @@ app.config['SECRET_KEY'] = b"_\xa8\xf0\x10\xcc3\xa6n\x9c'\xd1\xc5\x91\x06z1=\x8b
 app.config['UPLOAD_FOLDER'] = "/uploads"
 
 # Global Constant Declaration
-ALLOWED_EXTENSIONS = {'csv','txt'}
+ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 LOG_FILE = "address_list.json"
 
 
@@ -25,6 +25,7 @@ def request_spreadsheet():
         tab_folder = request.form['tab_folder']
         sheet_index = request.form['sheet_index']
         api_key = request.form['api_key']
+        file_path = upload_file(request)
 
         if not tab_folder: # TODO add verification?
             flash('Tab folder is required!')
@@ -78,7 +79,7 @@ def get_api_key():
             return render_template('api-key.html', api_key=api_key)
         except RagicReader.AuthenticationError:
             flash('Invalid username and/or password')
-
+    
 
     return render_template('api-key.html')
 
@@ -143,21 +144,19 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[-1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/', methods=['GET', 'POST'])
-def upload_file():
+def upload_file(request):
     if request.method == 'POST':
         # check if the post request has the file part
         if 'file' not in request.files:
             flash('No file part')
-            return redirect(request.url)
+            return ''
         file = request.files['file']
+
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if file.filename == '':
             flash('No selected file')
-            return redirect(request.url)
+            return ''
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-            return redirect(url_for('download_file', name=filename))
-    return ''
+            return file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
