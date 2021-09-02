@@ -21,15 +21,14 @@ def index():
 
 @app.route('/jobs/new/request-spreadsheet', methods=('GET', 'POST'))
 def request_spreadsheet():
-    print('here')
-    print('request', request)
+    
     if request.method == 'POST':
-        print('inside')
+        
         ragic_url = request.form['ragic_url']
 
-        # tab_folder = request.form['tab_folder']
-        # sheet_index = request.form['sheet_index']
+        
         api_key = request.form['api_key']
+        
         file_path = upload_file(request)
 
         if not ragic_url: # TODO add verification?
@@ -52,7 +51,7 @@ def request_spreadsheet():
 
     #return redirect(url_for('history'))
 
-@app.route('/request/confirm')
+@app.route('/request/confirm', methods=('GET', 'POST'))
 def confirmation():
     json_file = open(LOG_FILE, 'r')
 
@@ -64,11 +63,22 @@ def confirmation():
     data = [Address(entry) for entry in data]
     
     # Parse the table information
-    print(data)
+    
     
     flat_data = [list(entry) for entry in data]
+    
+    if request.method == 'POST':
+        
+        if request.form['submit_button'] == 'Cancel':
+            return redirect(url_for('request_spreadsheet'))
+        elif request.form['submit_button'] == 'Confirm':
+            #send mail
+            return redirect(url_for('c2m_publish'))
+    
 
     return render_template('confirmation.html', table_body=flat_data)
+
+    
 
 @app.route('/help/api-key', methods=('GET', 'POST'))
 def get_api_key():
