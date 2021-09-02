@@ -1,7 +1,7 @@
 {% extends 'base.html' %} {% block content %}
 <h1>{% block title %} Create a New Job {% endblock %}</h1>
 
-<form method="post" enctype=multipart/form-data>
+<form method="post">
     <!-- TODO
         1. Select endpoint (https://www.ragic.com/<account>/<tab folder>/<sheet Index>[/<record id>]?v=3&api)
                 Account: ccedatabase
@@ -10,8 +10,13 @@
         2. Backend request table from Ragic API
     -->
     <div class="form-group">
-        <label for="ragic_url">Ragic URL</label>
-        <input type="url" name="ragic_url" placeholder="Ex: https://www.ragic.com/ccedatabase/test2/8" class="form-control" value="{{ request.form['ragic_url'] }}"></input>
+        <label for="tab_folder">Tab folder</label>
+        <input type="text" name="tab_folder" placeholder="Ex: Colleges" class="form-control" value="{{ request.form['tab_folder'] }}"></input>
+    </div>
+
+    <div class="form-group">
+        <label for="sheet_index">Sheet number</label>
+        <input type="text" name="sheet_index" placeholder="Ex: 1" class="form-control" value="{{ request.form['sheet_index'] }}"></input>
     </div>
 
     <div class="form-group">
@@ -20,13 +25,14 @@
         <input type="text" name="api_key" placeholder="Not your password" class="form-control" value="{{ request.form['api_key'] }}"></input>
     </div>
 
-    <div class="form-group">
-        <label for="artwork">Upload artwork file</label>
+    <!-- <div class="form-group">
+        <label for="csv_file">Upload CSV file</label>
+        <form method=post enctype="multipart/form-data">
+            <input type="file" name=file>
 
-        <input type="file" name=file>
-        <input type="button" value="Upload" class='btn btn-secondary'>
-
-    </div>
+            <input type="button" value="Upload" class='btn btn-secondary'>
+        </form>
+    </div> -->
 
 
 
