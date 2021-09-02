@@ -8,7 +8,7 @@ import os
 # Flask App Initialization
 app = Flask(__name__)
 app.config['SECRET_KEY'] = b"_\xa8\xf0\x10\xcc3\xa6n\x9c'\xd1\xc5\x91\x06z1=\x8b|\xe7\xb8\x8d\xdb\xdd3\xd4j\x9e5\xdf\x04\xf5"
-app.config['UPLOAD_FOLDER'] = "/uploads"
+app.config['UPLOAD_FOLDER'] = "uploads"
 
 # Global Constant Declaration
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
@@ -21,21 +21,24 @@ def index():
 
 @app.route('/jobs/new/request-spreadsheet', methods=('GET', 'POST'))
 def request_spreadsheet():
+    print('here')
+    print('request', request)
     if request.method == 'POST':
-        tab_folder = request.form['tab_folder']
-        sheet_index = request.form['sheet_index']
+        print('inside')
+        ragic_url = request.form['ragic_url']
+
+        # tab_folder = request.form['tab_folder']
+        # sheet_index = request.form['sheet_index']
         api_key = request.form['api_key']
         file_path = upload_file(request)
 
-        if not tab_folder: # TODO add verification?
-            flash('Tab folder is required!')
-        if not sheet_index: # TODO add verification?
-            flash('Sheet index is required!')
+        if not ragic_url: # TODO add verification?
+            flash('URL is required!')
         if not api_key:
             flash('API Key is required!')
         else:
             # Parse table from Ragic
-            ragic_reader = RagicTools(tab_folder, sheet_index, api_key)
+            ragic_reader = RagicTools(ragic_url, api_key)
             
             table = ragic_reader.get_table() #NED json as string
 
@@ -143,6 +146,7 @@ def icon():
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[-1].lower() in ALLOWED_EXTENSIONS
+
 
 def upload_file(request):
     if request.method == 'POST':

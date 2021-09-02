@@ -89,16 +89,17 @@ class RagicReader():
 
 class RagicTools():
 
-    def __init__(self, tab_folder, sheet_index, api_key):
-        self.tab_folder = str(tab_folder)
-        self.sheet_index = str(sheet_index)
+    def __init__(self, url, api_key):
+        self.url = str(url)
         self.api_key = api_key
 
 
         self.base_url = 'https://www.ragic.com'
         self.account = 'ccedatabase' #TODO
 
-        self.endpoint_url = 'https://www.ragic.com/ccedatabase/%s/%s?api&APIKey=%s' % (self.tab_folder, self.sheet_index, self.api_key)
+        self.endpoint_url = '%s?api&APIKey=%s' % (self.url, self.api_key)
+    
+
 
 
 
