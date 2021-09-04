@@ -14,6 +14,7 @@ app.config['UPLOAD_FOLDER'] = "uploads"
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'}
 LOG_FILE = "address_list.json"
 
+artwork_path = None
 
 @app.route('/')
 def index():
@@ -73,7 +74,11 @@ def confirmation():
             return redirect(url_for('request_spreadsheet'))
         elif request.form['submit_button'] == 'Confirm':
             #send mail
+            #delete all files to prevent clutter
+            
             return redirect(url_for('c2m_publish'))
+
+            
     
 
     return render_template('confirmation.html', table_body=flat_data)
@@ -127,7 +132,14 @@ def c2m_publish():
 
     # Setting  Print Options
     po = c2mAPI.printOptions('Letter 8.5 x 11','Next Day','Address on First Page','Black and White','White 24#','Printing both sides','First Class','#10 Double Window')
-    c2m.runAll("test.pdf","2",po).text
+    print(artwork_path)
+    c2m.runAll(artwork_path,"2",po).text
+
+    #delete files
+    dir = 'uploads'
+    for f in os.listdir(dir):
+        os.remove(os.path.join(dir,f))
+    
 
     print('DOCID: ' + c2m.documentId)
     print('AddressListId: ' + c2m.addressListId)
@@ -160,17 +172,23 @@ def allowed_file(filename):
 
 def upload_file(request):
     if request.method == 'POST':
+        
         # check if the post request has the file part
         if 'file' not in request.files:
             flash('No file part')
-            return ''
+            return 'no file'
         file = request.files['file']
-
+        
+        
+        
         # If the user does not select a file, the browser submits an
         # empty file without a filename.
         if file.filename == '':
             flash('No selected file')
-            return ''
+            return ':( not uploaded'
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            return file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            global artwork_path
+            artwork_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            return 'uploaded!'
