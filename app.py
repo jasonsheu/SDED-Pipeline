@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, flash, redirect
+from flask import Flask, render_template, request, url_for, flash, redirect, session, send_from_directory
 from ragic_tools import *
 from Click2Mail import Address
 from werkzeug.utils import secure_filename
@@ -31,6 +31,10 @@ def request_spreadsheet():
         api_key = request.form['api_key']
         
         file_path = upload_file(request)
+
+        # TODO fix this
+        # if file_path != '':
+        #     session["filename"] = 'file_path'
 
         if not ragic_url: # TODO add verification?
             flash('URL is required!')
@@ -81,7 +85,7 @@ def confirmation():
             
     
 
-    return render_template('confirmation.html', table_body=flat_data)
+    return render_template('confirmation.html', table_body=flat_data, filename=artwork_filename)
 
     
 
@@ -93,7 +97,7 @@ def get_api_key():
 
         try:
             api_key = RagicReader.get_api_key(username, password)
-
+            # TODO use sessions to store api_key
             return render_template('api-key.html', api_key=api_key)
         except RagicReader.AuthenticationError:
             flash('Invalid username and/or password')
@@ -106,10 +110,10 @@ def c2m_publish():
     print("C2M REST IS RUNNING")
     
     # Stage account (0)
-    c2m = c2mAPI.c2mAPIRest("SDEnergyDistrict","LaneL0vesSanDiego!","0")
+    # c2m = c2mAPI.c2mAPIRest("SDEnergyDistrict","LaneL0vesSanDiego!","0")
     
     # Production account (1)
-    # c2m = c2mAPI.c2mAPIRest("lanewsharman","1Lovesandiego","1")
+    c2m = c2mAPI.c2mAPIRest("lanewsharman","1Lovesandiego","1")
     
 
     json_file = open(LOG_FILE, 'r')
@@ -118,8 +122,9 @@ def c2m_publish():
     df = df.transpose()
     df = df.drop(["_ragicId", "_star", "_index_title_", "_index_", "_seq"], axis=1).sort_index()
     data = df.to_dict('records')
-
+    print(data)
     for address in data:
+        print (address)
         c2m.addressList.append(address)
 
     
@@ -131,14 +136,15 @@ def c2m_publish():
     #c2m.addressList.append(address)
 
     # Setting  Print Options
-    po = c2mAPI.printOptions('Letter 8.5 x 11','Next Day','Address on First Page','Black and White','White 24#','Printing both sides','First Class','#10 Double Window')
-    print(artwork_path)
-    c2m.runAll(artwork_path,"2",po).text
+    # po = c2mAPI.printOptions('Letter 8.5 x 11','Next Day','Address on First Page','Black and White','White 24#','Printing both sides','First Class','#10 Double Window')
+    po = c2mAPI.printOptions('Postcard 3.5 x 5','Next Day','Single Sided Postcard','Black and White','White Uncoated','Printing both sides','First Class','#10 Double Window')
+    print("PATH:",artwork_path)
+    print(c2m.runAll(artwork_path,"2",po).text)
 
     #delete files
-    dir = 'uploads'
-    for f in os.listdir(dir):
-        os.remove(os.path.join(dir,f))
+    # dir = 'uploads'
+    # for f in os.listdir(dir):
+    #     os.remove(os.path.join(dir,f))
     
 
     print('DOCID: ' + c2m.documentId)
@@ -153,6 +159,10 @@ def c2m_publish():
     # TODO https://flask.palletsprojects.com/en/1.1.x/patterns/flashing/
     # TODO https://rest.click2mail.com/#/
 
+
+@app.route('/uploads/<filename>')
+def download_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], artwork_filename)
 
 @app.route('/jobs/history/')
 def history():
@@ -176,8 +186,9 @@ def upload_file(request):
         # check if the post request has the file part
         if 'file' not in request.files:
             flash('No file part')
-            return 'no file'
+            return ''
         file = request.files['file']
+        
         
         
         
@@ -185,10 +196,13 @@ def upload_file(request):
         # empty file without a filename.
         if file.filename == '':
             flash('No selected file')
-            return ':( not uploaded'
+            return ''
         if file and allowed_file(file.filename):
+            
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             global artwork_path
             artwork_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            return 'uploaded!'
+            global artwork_filename
+            artwork_filename = filename # TODO fix this
+            return filename
