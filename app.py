@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, flash, redirect
+from flask import Flask, render_template, request, url_for, flash, redirect, session, send_from_directory
 from ragic_tools import *
 from Click2Mail import Address
 from werkzeug.utils import secure_filename
@@ -81,7 +81,8 @@ def confirmation():
             
     
 
-    return render_template('confirmation.html', table_body=flat_data)
+    return render_template('confirmation.html', table_body=flat_data, filename=artwork_filename)
+
 
     
 
@@ -162,6 +163,9 @@ def history():
 def icon():
     return redirect(url_for('static', filename='sded-logo.png'))
 
+@app.route('/uploads/<filename>')
+def download_file(filename):
+    return send_from_directory(app.config["UPLOAD_FOLDER"], artwork_filename)
 
 #file uploading
 def allowed_file(filename):
@@ -184,10 +188,13 @@ def upload_file(request):
         # empty file without a filename.
         if file.filename == '':
             flash('No selected file')
-            return ':( not uploaded'
+            return ''
         if file and allowed_file(file.filename):
+            
             filename = secure_filename(file.filename)
             file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             global artwork_path
             artwork_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            return 'uploaded!'
+            global artwork_filename
+            artwork_filename = filename # TODO fix this
+            return filename
