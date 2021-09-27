@@ -9,30 +9,41 @@
                 shee Index: user-input
         2. Backend request table from Ragic API
     -->
-    <div class="form-group">
-        <label for="ragic_url">Ragic URL</label>
-        <input type="url" name="ragic_url" placeholder="Ex: https://www.ragic.com/ccedatabase/test2/8" class="form-control" value="{{ request.form['ragic_url'] }}"></input>
-    </div>
-
-    <div class="form-group">
-        <label for="api_key">API Key <a href="{{ url_for('get_api_key') }}">(What's this?)</a></label>
-        <!-- How to find API Key? -->
-        <input type="text" name="api_key" placeholder="Not your password" class="form-control" value="{{ request.form['api_key'] }}"></input>
-    </div>
-
-    <div class="form-group">
-        <label for="artwork">Upload artwork file</label>
-
-        <input type="file" name=file>
 
 
-    </div>
+    <form method="post">
+        <div class="form-group">
+            <label for="ragic_url">Ragic URL</label>
+            <input type="url" name="ragic_url" placeholder="Ex: https://www.ragic.com/ccedatabase/test2/8" class="form-control" value="{{ request.form['ragic_url'] }}"></input>
+        </div>
+
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input type="email" name="username" autocomplete="username" required placeholder="ex: cookie.monster@sandiegoenergydistrict.org" class="form-control" value="{{ request.form['username'] }}" />
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" name="password" autocomplete="current-password" required class="form-control" value="{{ request.form['password'] }}" />
+        </div>
+
+        <div class="form-group">
+            <label for="artwork">Upload artwork file</label>
+
+            <input type="file" name=file>
+
+
+        </div>
+        <div class="form-group">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+
+    </form>
 
 
 
-    <div class="form-group">
-        <button type="submit" class="btn btn-primary">Submit</button>
-    </div>
+
+
 
 
 </form>

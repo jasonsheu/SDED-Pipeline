@@ -26,16 +26,13 @@ def request_spreadsheet():
     if request.method == 'POST':
         
         ragic_url = request.form['ragic_url']
-
-        
-        api_key = request.form['api_key']
-        
+        api_key = get_api_key()
         file_path = upload_file(request)
 
         if not ragic_url: # TODO add verification?
             flash('URL is required!')
         if not api_key:
-            flash('API Key is required!')
+            flash('Login is required!')
         else:
             # Parse table from Ragic
             ragic_reader = RagicTools(ragic_url, api_key)
@@ -80,8 +77,8 @@ def confirmation():
 
             
     
-
     return render_template('confirmation.html', table_body=flat_data, filename=artwork_filename)
+    
 
 
     
@@ -95,12 +92,12 @@ def get_api_key():
         try:
             api_key = RagicReader.get_api_key(username, password)
 
-            return render_template('api-key.html', api_key=api_key)
+            return api_key
         except RagicReader.AuthenticationError:
             flash('Invalid username and/or password')
     
 
-    return render_template('api-key.html')
+    
 
 @app.route('/publish')
 def c2m_publish():
@@ -175,7 +172,7 @@ def allowed_file(filename):
 
 def upload_file(request):
     if request.method == 'POST':
-        
+        print('uploading')
         # check if the post request has the file part
         if 'file' not in request.files:
             flash('No file part')
@@ -196,5 +193,10 @@ def upload_file(request):
             global artwork_path
             artwork_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             global artwork_filename
+
             artwork_filename = filename # TODO fix this
+            print(artwork_filename)
             return filename
+        else:       
+            error = 'Wrong filetype!! Please use one of these: ' + str(ALLOWED_EXTENSIONS)
+            print(error)
