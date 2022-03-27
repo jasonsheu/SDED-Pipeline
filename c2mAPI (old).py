@@ -3,7 +3,6 @@ import requests
 import xml.etree.ElementTree
 import uuid
 from datetime import datetime
-from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 class c2mAPIBatch(object):
 	def __init__(self,username,password,mode):
@@ -23,19 +22,19 @@ class c2mAPIBatch(object):
 	def setFileName(self,fileName,filePath):
 		self.fileName = fileName
 		self.filePath = filePath
-	def runAll(self):
+	def runAll(self) :
 		result = self.createBatch()
-		if result.status_code > 299:
+		if result.status_code > 299 :
 			return result
 		result =self.sendPDF(self.filePath)
-		if result.status_code > 299:
+		if result.status_code > 299 :
 			return result
 		str = self.createBatchXML()#.decode(encoding="utf-8")
 		result = self.sendXML(str)
-		if result.status_code > 299:
+		if result.status_code > 299 :
 			return result
 		result = self.submitBatch()
-		if result.status_code > 299:
+		if result.status_code > 299 :
 			return result
 		return self.getBatchStatus()
 	def createBatchXML(self):
@@ -82,12 +81,12 @@ class c2mAPIBatch(object):
 	def addJob(self,startPage,endPage, printOptions, returnAddress, recipients):
 		job = {"startPage":startPage,"endPage":endPage,"printOptions":printOptions,"returnAddress":returnAddress,"recipients":recipients}
 		self.jobs.append(job)
-	def getBatchUrl(self):
+	def getBatchUrl(self) :
 		if self.mode == "0":
 			return "https://stage-batch.click2mail.com"
 		else:
 			return "https://batch.click2mail.com"
-	def createBatch(self):
+	def createBatch(self) :
 		print("Creating Batch")
 		url = self.getBatchUrl() + '/v1/batches'
 		r = requests.post(url, auth=(self.username, self.password))
@@ -101,7 +100,7 @@ class c2mAPIBatch(object):
 			self.batchID= elem.text
 			print("Batch ID: ", self.batchID)
 		return r
-	def sendXML(self,xmlStr):
+	def sendXML(self,xmlStr) :
 		print("Sending XML")
 		global batchID 
 		headers = {'user-agent': 'my-app/0.0.1','content-type':'application/xml'}
@@ -128,7 +127,6 @@ class c2mAPIBatch(object):
 		print(r.text)
 		return r
 class printOptions(object):
-	
 	def __init__(self,documentClass,productionTime,layout,color,paperType,printOption,mailClass,envelope):
 		self.documentClass =documentClass
 		self.productionTime = productionTime
@@ -147,7 +145,7 @@ class returnAddress(object):
 		self.city = city
 		self.state = state
 		self.postalCode = postalCode
-class c2mAPIRest(object):
+class c2mAPIRest(object) :
 	def __init__(self,username,password,mode):
 		self.batchID = "0"
 		self.jobId = "0"
@@ -159,34 +157,34 @@ class c2mAPIRest(object):
 		self.addressList = []
 		self.addressMappingId = "0"
 		
-	def runAllDoubleSided(self,fileNameSide1,fileNameSide2,documentName,documentClass,documentFormat,addressMappingId,printOptions):
+	def runAllDoubleSided(self,fileNameSide1,fileNameSide2,documentName,documentClass,documentFormat,addressMappingId,printOptions) :
 		utcNow = datetime.utcnow()
 		self.pringOptions = printOptions
 		self.addressMappingId = addressMappingId;
 
 		print("uploading side1 image " + fileNameSide1)
 		result = self.createDocument_v2(fileNameSide1, 'side1_'+str(utcNow), documentClass,documentFormat)
-		if result.status_code > 299:
-				return result
+		if result.status_code > 299 :
+			return result
 		print(self.documentId)
-		document1Id = self.documentId
+		document1Id = '394779' #self.documentId
 
 		print("uploading side2 image " + fileNameSide2)
 		result = self.createDocument_v2(fileNameSide2, 'side2_'+str(utcNow), documentClass,documentFormat)
-		if result.status_code > 299:
-				return result
+		if result.status_code > 299 :
+			return result
 		print(self.documentId)
-		document2Id = self.documentId
+		document2Id = '394780' #self.documentId
 
 		print('merging sides to create document ' + documentName)
 		result = self.mergeDocuments(document1Id,document2Id,documentName + '_' + str(utcNow))
-		if result.status_code > 299:
-				return result
+		if result.status_code > 299 :
+			return result
 		print('Document merged ' + self.documentId)
 
 		result = self.uploadAddressList()
-		if result.status_code > 299:
-				return result
+		if result.status_code > 299 :
+			return result
 
 		print("upload address: " + result.text)
 		e = xml.etree.ElementTree.fromstring(result.text)
@@ -194,7 +192,7 @@ class c2mAPIRest(object):
 			self.addressStatus =  elem.text
 		while self.addressStatus != "3":
 			result = self.getAddressStatus()
-			if result.status_code > 299:
+			if result.status_code > 299 :
 				return result
 			e = xml.etree.ElementTree.fromstring(result.text)
 			for elem in e.iter(tag='status'):
@@ -202,30 +200,30 @@ class c2mAPIRest(object):
 			print("Waiting On AddresList")
 
 		result = self.createJob(printOptions)
-		if result.status_code > 299:
-				return result
-		result =self.submitJob()
-		if result.status_code > 299:
-				return result
+		if result.status_code > 299 :
+			return result
+		result = self.submitJob()
+		if result.status_code > 299 :
+			return result
 		return self.getJobStatus()
 
 
-	def runAll(self,fileName,addressMappingId,printOptions):
+	def runAll(self,fileName,addressMappingId,printOptions) :
 		self.pringOptions = printOptions
 		self.addressMappingId = addressMappingId;
 		result = self.createDocument(fileName)
-		if result.status_code > 299:
+		if result.status_code > 299 :
 			return result
 		#print(self.documentId)
 		result = self.uploadAddressList()
-		if result.status_code > 299:
+		if result.status_code > 299 :
 			return result
 		e = xml.etree.ElementTree.fromstring(result.text)
 		for elem in e.iter(tag='status'):
 			self.addressStatus =  elem.text
 		while self.addressStatus != "3":
 			result = self.getAddressStatus()
-			if result.status_code > 299:
+			if result.status_code > 299 :
 				return result
 			e = xml.etree.ElementTree.fromstring(result.text)
 			for elem in e.iter(tag='status'):
@@ -233,53 +231,47 @@ class c2mAPIRest(object):
 			print("Waiting On AddresList")
 		
 		result = self.createJob(printOptions)
-		if result.status_code > 299:
+		if result.status_code > 299 :
 			return result
 		result =self.submitJob()
-		if result.status_code > 299:
+		if result.status_code > 299 :
 			return result
 		return self.getJobStatus()
-	def getRestUrl(self):
+
+	def getRestUrl(self) :
 		if self.mode == "0":
 			return "https://stage-rest.click2mail.com"
 		else:
 			return "https://rest.click2mail.com"
 
 	def createDocument_v2(self,fileName,documentName,documentClass,documentFormat):
-			mp_encoder = MultipartEncoder(
-					fields={
-							'documentFormat': documentFormat,
-							'documentName': documentName,
-							'documentClass': documentClass,
-							'file': (fileName, open(fileName,'rb'), 'image/png')
-					}
-			)
-			headers = {'user-agent': 'my-app/0.0.1','Content-Type': mp_encoder.content_type}
-			r = requests.post(self.getRestUrl() + '/molpro/documents/',auth=(self.username, self.password),headers=headers,data=mp_encoder)
-			if r.status_code > 299:
-					return r
-			#print(r.status_code)
-			#print(r.text)
-			e = xml.etree.ElementTree.fromstring(r.text)
-			for elem in e.iter(tag='id'):
-					#global documentID
-					self.documentId = elem.text
-					#print(documentID)
+		headers = {'user-agent': 'my-app/0.0.1'}
+		files = {'file': (fileName, open(fileName,'r+b'), 'image/png'),
+		'documentFormat': documentFormat,
+		'documentName': documentName,
+		'documentClass': documentClass}
+		r = requests.post(self.getRestUrl() + '/molpro/documents/',auth=(self.username, self.password),headers=headers,files=files)
+		if r.status_code > 299 :
 			return r
+		#print(r.status_code)
+		#print(r.text)
+		e = xml.etree.ElementTree.fromstring(r.text)
+		for elem in e.iter(tag='id'):
+			#global documentID
+			self.documentId = elem.text
+			#print(documentID)
+		return r
 
 
 	def createDocument(self,fileName):
-		mp_encoder = MultipartEncoder(
-				fields={
-						'documentFormat': 'PDF',
-						'documentName': 'sample Letter',
-						'documentClass': 'Letter 8.5 x 11',
-				'file': (fileName, open(fileName,'rb'), 'application/pdf')
-				}
-		)
-		headers = {'user-agent': 'my-app/0.0.1','Content-Type': mp_encoder.content_type}
-		r = requests.post(self.getRestUrl() + '/molpro/documents/',auth=(self.username, self.password),headers=headers,data=mp_encoder)
-		if r.status_code > 299:
+		headers = {'user-agent': 'my-app/0.0.1'}
+		files = {'file': ('file.pdf', open(fileName,'r+b'), 'application/pdf'),
+        	'documentFormat': 'PDF',
+        	'documentName': 'sample Letter',
+        	'documentClass': 'Letter 8.5 x 11'
+    	}
+		r = requests.post(self.getRestUrl() + '/molpro/documents/',auth=(self.username, self.password),headers=headers,files=files)
+		if r.status_code > 299 :
 			return r
 		#print(r.status_code)
 		#print(r.text)
@@ -292,28 +284,29 @@ class c2mAPIRest(object):
 
 
 	def createDocumentMergeList(self,document1Id,document2Id):
-				from xml.etree.ElementTree import Element, SubElement, tostring
+		from xml.etree.ElementTree import Element, SubElement, tostring
 
-				root = Element('documentList')
-				child = SubElement(root, "documentId")
-				child.text = document1Id
-				child = SubElement(root, "documentId")
-				child.text = document2Id
-				return tostring(root)
+		root = Element('documentList')
+		child = SubElement(root, "documentId")
+		child.text = document1Id
+		child = SubElement(root, "documentId")
+		child.text = document2Id
+
+		return tostring(root)
 
 	def mergeDocuments(self,document1Id,document2Id,documentName):
-				xmlstr = self.createDocumentMergeList(document1Id,document2Id)
-				print(xmlstr)
-				headers = {'user-agent': 'my-app/0.0.1','Content-Type':'application/xml'}
-				r = requests.post(self.getRestUrl() + '/molpro/documents/merge?documentName='+documentName,auth=(self.username, self.password),data=xmlstr,headers=headers)
-				if r.status_code > 299:
-						return r
-				#print(r.status_code)
-				e = xml.etree.ElementTree.fromstring(r.text)
-				for elem in e.iter(tag='id'):
-						self.documentId= elem.text
-						#print(self.documentId)
-				return  r
+		xmlstr = self.createDocumentMergeList(document1Id,document2Id)
+		#print(xmlstr)
+		headers = {'user-agent': 'my-app/0.0.1','Content-Type':'application/xml'}
+		r = requests.post(self.getRestUrl() + '/molpro/documents/merge?documentName='+documentName,auth=(self.username, self.password),data=xmlstr,headers=headers)
+		if r.status_code > 299 :
+			return r
+		#print(r.status_code)
+		e = xml.etree.ElementTree.fromstring(r.text)
+		for elem in e.iter(tag='id'):
+			self.documentId= elem.text
+			#print(self.documentId)
+		return  r
 
 	def createAddressList(self,addressMappingId):
 		from xml.etree.ElementTree import Element, SubElement, tostring
@@ -330,12 +323,13 @@ class c2mAPIRest(object):
 				newElem = SubElement(elem,key)
 				newElem.text = value
 		return tostring(root)
+
 	def uploadAddressList(self):
 		xmlstr = self.createAddressList(self.addressMappingId)
 		print(xmlstr)
 		headers = {'user-agent': 'my-app/0.0.1','Content-Type':'application/xml'}
 		r = requests.post(self.getRestUrl() + '/molpro/addressLists/',auth=(self.username, self.password),data=xmlstr, headers=headers)
-		if r.status_code > 299:
+		if r.status_code > 299 :
 			return r
 		#print(r.status_code)
 		e = xml.etree.ElementTree.fromstring(r.text)
@@ -343,17 +337,21 @@ class c2mAPIRest(object):
 			self.addressListId= elem.text
 			#print(self.addressListId)
 		return	r
+
 	def getAddressListStatus(self):
+		xmlstr = self.createAddressList(self.addressMappingId)
+		# NED: print(xmlstr)
 		headers = {'user-agent': 'my-app/0.0.1','content-type':'application/xml'}
 		r = requests.get(self.getRestUrl() + '/molpro/addressLists/' + self.addressListId,auth=(self.username, self.password),data=xmlstr)
 		#print(r.status_code)
 		#e = xml.etree.ElementTree.fromstring(r.text)
 		return	r
+
 	def createJob(self,printOptions):
 		headers = {'user-agent': 'my-app/0.0.1'}
 		values = {'documentClass': printOptions.documentClass,'layout':printOptions.layout,'productionTime':printOptions.productionTime,'envelope':printOptions.envelope,'color':printOptions.color,'paperType':printOptions.paperType,'printOption': printOptions.printOption,'documentId':self.documentId,'addressId':self.addressListId}
 		r = requests.post(self.getRestUrl() + '/molpro/jobs/',auth=(self.username, self.password),data=values)
-		if r.status_code > 299:
+		if r.status_code > 299 :
 			return r
 		#print(r.status_code)
 		#print(r.text)
@@ -362,18 +360,20 @@ class c2mAPIRest(object):
 			#global jobId 
 			self.jobId = elem.text
 			#print(self.jobId)
-		return r	
+		return r
+
 	def submitJob(self):
 		#global jobId
 		headers = {'user-agent': 'my-app/0.0.1'}
 		values = {'billingType': 'User Credit'}
 		r = requests.post(self.getRestUrl() + '/molpro/jobs/' + self.jobId + '/submit',auth=(self.username, self.password),data=values)
-		if r.status_code > 299:
+		if r.status_code > 299 :
 			return r
 		#print(r.status_code)
 		#print(r.text)
 		e = xml.etree.ElementTree.fromstring(r.text)
 		return r
+
 	def getJobStatus(self):
 		headers = {'user-agent': 'my-app/0.0.1'}
 		r = requests.get(self.getRestUrl() + '/molpro/jobs/' + self.jobId ,auth=(self.username, self.password))
