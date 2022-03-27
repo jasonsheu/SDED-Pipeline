@@ -1,5 +1,16 @@
 # SDED-Pipeline
 
+This project was created for [San Diego Energy
+District](https://www.sandiegoenergydistrict.org/). It is not currently under
+development.
+
+Authors: Nico de la Fuente & Jason Sheu
+Last updated: September 2021
+
+## APIs being used
+- Click2Mail: [GitHub](https://github.com/click2mail),
+  [Docs](https://rest.click2mail.com/)
+- Ragic: [Docs](https://www.ragic.com/intl/en/doc-api)
 
 ## Flask
 
